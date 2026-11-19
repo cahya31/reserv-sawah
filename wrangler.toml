@@ -5,4 +5,4 @@ compatibility_date = "2026-11-19"
 [[d1_databases]]
 binding = "DB"
 database_name = "reserv-sawah-db"
-database_id = "GANTI_DATABASE_ID_D1"
+database_id = "cf6c184a-82ac-4b57-a7a8-91ee35805619"
