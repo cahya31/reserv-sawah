@@ -1,4 +1,4 @@
-name = "ruang-rapat-dtphp"
+name = "reserv-dtphp"
 main = "src/index.js"
 compatibility_date = "2026-11-19"
 
