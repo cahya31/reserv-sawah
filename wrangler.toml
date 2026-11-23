@@ -2,6 +2,9 @@ name = "reserv-dtphp"
 main = "src/index.js"
 compatibility_date = "2026-11-19"
 
+[triggers]
+crons = ["* * * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "reserv-sawah-db"
