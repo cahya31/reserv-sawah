@@ -63,4 +63,11 @@ export default { async fetch(req,env) {
   q=p.match(/^\/api\/reservations\/([^/]+)$/);if(q&&m==='PATCH'){admin();const b=await body();if(!['APPROVED','REJECTED','IN_PROGRESS','COMPLETED'].includes(b.status))throw Error('Status tidak valid.');await env.DB.prepare('UPDATE reservations SET status=? WHERE id=?').bind(b.status,q[1]).run();return reply({ok:true})}if(q&&m==='DELETE'){admin();await env.DB.prepare('DELETE FROM reservations WHERE id=?').bind(q[1]).run();return reply({ok:true})}
   return reply({error:'Endpoint tidak ditemukan.'},404);
  }catch(e){return reply({error:e.message||'Kesalahan server.'},e.status||400)}
-}};
+},
+ async scheduled(controller,env,ctx) {
+  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+  const get=t=>parts.find(x=>x.type===t).value;
+  const date=get('year')+'-'+get('month')+'-'+get('day'),time=get('hour')+':'+get('minute');
+  await env.DB.prepare("UPDATE reservations SET status='APPROVED' WHERE status='PENDING' AND date=? AND start_time<=?").bind(date,time).run();
+ }
+};
