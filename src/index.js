@@ -73,11 +73,11 @@ body{background:linear-gradient(rgba(7,39,22,.28),rgba(8,45,25,.42)),url("https:
 .top small,.top h1,.top p{position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.45)}
 .top p{max-width:620px}
 
-.wrap{background:rgba(248,252,247,.62);border:1px solid rgba(255,255,255,.48);border-radius:24px;padding:22px 24px;box-shadow:0 18px 50px rgba(0,35,16,.18);backdrop-filter:blur(5px)}
-.bar{background:rgba(255,255,255,.76)}
-.lane{background:rgba(255,255,255,.78)}
-.item{background:rgba(255,255,255,.76)}
-.lane .empty{background:rgba(248,250,248,.62);backdrop-filter:blur(4px)}
+.wrap{background:rgba(248,252,247,.32);border:1px solid rgba(255,255,255,.34);border-radius:24px;padding:22px 24px;box-shadow:0 18px 50px rgba(0,35,16,.14);backdrop-filter:blur(2px)}
+.bar{background:rgba(255,255,255,.42)}
+.lane{background:rgba(255,255,255,.44)}
+.item{background:rgba(255,255,255,.48)}
+.lane .empty{background:rgba(248,250,248,.34);backdrop-filter:blur(2px)}
 
 @media(max-width:700px){body{background-attachment:scroll}.top{min-height:210px;padding-right:110px}.wrap{padding:14px 12px;border-radius:17px;margin:14px auto}}
 
