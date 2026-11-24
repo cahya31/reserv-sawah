@@ -72,24 +72,23 @@ body{background:linear-gradient(rgba(7,39,22,.28),rgba(8,45,25,.42)),url("https:
 .top:after{border-color:#ffffff30;box-shadow:0 0 0 35px #ffffff10,0 0 0 75px #ffffff08}
 .top small,.top h1,.top p{position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.45)}
 .top p{max-width:620px}
-.dragonfly{position:absolute;z-index:3;left:68%;top:18px;width:170px;height:145px;pointer-events:none;filter:drop-shadow(0 9px 8px rgba(0,0,0,.42));animation:dragonflyNaturalFlight 15s ease-in-out infinite}
-.dragonfly img{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen;transform-origin:50% 50%;animation:dragonflyWingBuzz .13s ease-in-out infinite alternate}
+.dragonfly{position:absolute;z-index:3;left:68%;top:18px;width:170px;height:145px;pointer-events:none;filter:drop-shadow(0 9px 8px rgba(0,0,0,.42));animation:dragonflyNaturalFlight 16s ease-in-out infinite}
+.dragonfly img{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen;transform-origin:50% 50%;animation:dragonflyWingBuzz .12s ease-in-out infinite alternate}
 @keyframes dragonflyNaturalFlight{
-0%,100%{left:68%;top:18px;transform:rotate(-12deg) scale(1)}
-12%{left:53%;top:38px;transform:rotate(9deg) scale(.94)}
-25%{left:28%;top:12px;transform:rotate(-7deg) scale(.88)}
-37%{left:39%;top:75px;transform:rotate(16deg) scale(.92)}
-49%{left:73%;top:28px;transform:rotate(-14deg) scale(1.02)}
-61%{left:83%;top:88px;transform:rotate(11deg) scale(.9)}
-73%{left:57%;top:52px;transform:rotate(-8deg) scale(.96)}
-86%{left:18%;top:22px;transform:rotate(13deg) scale(.86)}
+0%,100%{left:68%;top:36px;transform:rotate(90deg) scale(1)}
+14%{left:54%;top:30px;transform:rotate(88deg) scale(.98)}
+28%{left:37%;top:40px;transform:rotate(92deg) scale(.94)}
+42%{left:23%;top:31px;transform:rotate(89deg) scale(.92)}
+56%{left:39%;top:24px;transform:rotate(91deg) scale(.95)}
+70%{left:60%;top:38px;transform:rotate(88deg) scale(.99)}
+84%{left:79%;top:29px;transform:rotate(91deg) scale(1.02)}
 }
-@keyframes dragonflyWingBuzz{from{transform:rotate(-3deg) scaleY(.94)}to{transform:rotate(3deg) scaleY(1.06)}}
+@keyframes dragonflyWingBuzz{from{transform:rotate(-2deg) scaleY(.93)}to{transform:rotate(2deg) scaleY(1.07)}}
 .wrap{background:rgba(248,252,247,.84);border:1px solid rgba(255,255,255,.55);border-radius:24px;padding:22px 24px;box-shadow:0 18px 50px rgba(0,35,16,.22);backdrop-filter:blur(7px)}
 .bar{background:rgba(255,255,255,.94)}
 .lane{background:rgba(255,255,255,.96)}
 .dragonfly-credit{position:absolute;z-index:2;right:12px;bottom:7px;color:#effff2;font-size:8px;opacity:.78;text-shadow:0 1px 3px #123}
-@media(max-width:700px){body{background-attachment:scroll}.top{min-height:210px;padding-right:110px}.dragonfly{width:105px;height:92px;left:58%;top:22px;animation-duration:12s}.wrap{padding:14px 12px;border-radius:17px;margin:14px auto}}
+@media(max-width:700px){body{background-attachment:scroll}.top{min-height:210px;padding-right:110px}.dragonfly{width:105px;height:92px;left:58%;top:22px;animation-duration:13s}.wrap{padding:14px 12px;border-radius:17px;margin:14px auto}}
 @media(prefers-reduced-motion:reduce){.dragonfly,.dragonfly img{animation:none!important}}
 </style></head><body><header class="top"><div class="dragonfly" aria-hidden="true"><img src="https://pngimg.com/uploads/dragonfly/dragonfly_PNG20.png" alt=""></div><span class="dragonfly-credit">Foto capung: PNGimg</span><small>● MONITOR PUBLIK · DTPHP</small><h1>Jadwal Ruang Rapat</h1><p>Pantau penggunaan ruangan dan status reservasi secara langsung.</p></header><main class="wrap"><div class="bar"><label><b>Filter tanggal</b> &nbsp;<input id="day" type="date"></label><span class="updated" id="updated">Memuat jadwal...</span></div><section id="list" class="list"><div class="empty">Memuat jadwal...</div></section></main><script>const day=document.getElementById('day'),list=document.getElementById('list'),updated=document.getElementById('updated');let rows=[];function esc(v){return String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}function show(){const data=rows.filter(x=>!day.value||x.date===day.value);const groups=[{key:'IN_PROGRESS',title:'Sudah Dimulai',cls:'started'},{key:'APPROVED',title:'Menunggu',cls:'waiting'},{key:'PENDING',title:'Belum Disetujui',cls:'pending'}];const card=x=>'<article class="item"><div class="date">'+new Date(x.date+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+'</div><div><div class="room">'+esc(x.roomName)+'</div><div class="time">'+x.start_time+' – '+x.end_time+'</div></div><div class="person"><small>Nama pemesan</small><strong>'+esc(x.bookedBy||'—')+'</strong></div><span class="status '+x.status+'">'+(x.status==='IN_PROGRESS'?'Sudah Dimulai':x.status==='PENDING'?'Belum Disetujui':'Menunggu')+'</span></article>';list.innerHTML=groups.map(g=>{const items=data.filter(x=>x.status===g.key);return '<section class="lane '+g.cls+'"><h2 class="lane-head">'+g.title+' <span>'+items.length+'</span></h2>'+(items.length?items.map(card).join(''):'<div class="empty">Belum ada jadwal</div>')+'</section>'}).join('')}async function load(){try{const r=await fetch('/api/monitor-schedule',{cache:'no-store'});if(!r.ok)throw Error('Gagal memuat');const d=await r.json();rows=d.reservations||[];show();updated.textContent='Diperbarui '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(e){updated.textContent='Koneksi terputus'}}day.addEventListener('change',show);load();setInterval(load,5000);</script></body></html>`;
 export default { async fetch(req,env) {
