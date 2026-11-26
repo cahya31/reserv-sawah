@@ -25,6 +25,15 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Prepare app logo
+        run: |
+          mkdir -p android/app/src/main/res/mipmap-mdpi android/app/src/main/res/mipmap-hdpi android/app/src/main/res/mipmap-xhdpi android/app/src/main/res/mipmap-xxhdpi android/app/src/main/res/mipmap-xxxhdpi
+          curl -fsSL 'https://cdn.phototourl.com/anon/2026-11-19-0ec35848-edf5-48d9-bfcf-0bc8997706a6.jpg' -o /tmp/reservasi-logo.jpg
+          convert /tmp/reservasi-logo.jpg -auto-orient -resize '48x48^' -gravity center -extent 48x48 android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+          convert /tmp/reservasi-logo.jpg -auto-orient -resize '72x72^' -gravity center -extent 72x72 android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          convert /tmp/reservasi-logo.jpg -auto-orient -resize '96x96^' -gravity center -extent 96x96 android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          convert /tmp/reservasi-logo.jpg -auto-orient -resize '144x144^' -gravity center -extent 144x144 android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+          convert /tmp/reservasi-logo.jpg -auto-orient -resize '192x192^' -gravity center -extent 192x192 android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
       - name: Build debug APK
         working-directory: android
         run: gradle --no-daemon assembleDebug
