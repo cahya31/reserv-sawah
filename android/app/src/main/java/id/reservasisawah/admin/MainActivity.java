@@ -21,6 +21,7 @@ import android.media.AudioManager;
 public class MainActivity extends Activity {
     private static final String APP_URL = "https://reserv-sawah.ayimasnoneng.workers.dev/";
     private static final String CHANNEL_ID = "reservasi_badge";
+    private static final String EVENTS_CHANNEL_ID = "reservasi_events";
     private static final int BADGE_NOTIFICATION_ID = 731;
     private static final int NOTIFICATION_PERMISSION_REQUEST = 7310;
     private WebView webView;
@@ -37,10 +38,12 @@ public class MainActivity extends Activity {
 
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         createBadgeChannel();
+        createEventsChannel();
         requestNotificationPermissionIfNeeded();
 
         webView = new WebView(this);
         webView.addJavascriptInterface(new BadgeBridge(), "AndroidBadge");
+        webView.addJavascriptInterface(new AndroidNotificationsBridge(), "AndroidNotifications");
         setContentView(webView);
 
         WebSettings settings = webView.getSettings();
@@ -106,6 +109,18 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void createEventsChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                EVENTS_CHANNEL_ID, "Pemberitahuan reservasi", NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Pemberitahuan persetujuan, penolakan, dan perubahan reservasi.");
+            channel.setShowBadge(true);
+            channel.enableVibration(true);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
     private void requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= 33 &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -116,6 +131,31 @@ public class MainActivity extends Activity {
     private boolean canPostNotifications() {
         return Build.VERSION.SDK_INT < 33 ||
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private class AndroidNotificationsBridge {
+        @JavascriptInterface
+        public boolean isAvailable() { return true; }
+
+        @JavascriptInterface
+        public void show(final String title, final String body) {
+            runOnUiThread(() -> {
+                if (notificationManager == null || !canPostNotifications()) return;
+                Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                    ? new Notification.Builder(MainActivity.this, EVENTS_CHANNEL_ID)
+                    : new Notification.Builder(MainActivity.this);
+                Notification notification = builder
+                    .setSmallIcon(android.R.drawable.ic_dialog_info)
+                    .setContentTitle(title == null || title.isEmpty() ? "Pemberitahuan Reservasi" : title)
+                    .setContentText(body == null ? "" : body)
+                    .setStyle(new Notification.BigTextStyle().bigText(body == null ? "" : body))
+                    .setCategory(Notification.CATEGORY_EVENT)
+                    .setAutoCancel(true)
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .build();
+                notificationManager.notify((int) (System.currentTimeMillis() & 0x7fffffff), notification);
+            });
+        }
     }
 
     private class BadgeBridge {
