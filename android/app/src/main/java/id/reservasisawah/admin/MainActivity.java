@@ -11,6 +11,7 @@ import android.webkit.WebViewClient;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.media.AudioManager;
 
 public class MainActivity extends Activity {
     private static final String APP_URL = "https://reserv-sawah.ayimasnoneng.workers.dev/";
@@ -19,6 +20,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         Window window = getWindow();
         window.setStatusBarColor(0xFF176B45);
         window.setNavigationBarColor(0xFF103F2C);
@@ -33,6 +35,7 @@ public class MainActivity extends Activity {
         settings.setLoadsImagesAutomatically(true);
         settings.setSupportZoom(false);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
 
         CookieManager cookies = CookieManager.getInstance();
