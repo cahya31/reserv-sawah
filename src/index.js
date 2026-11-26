@@ -67,7 +67,7 @@ body{background:linear-gradient(135deg,#f2f8f0 0%,#e8f2e7 48%,#f7faf5 100%)}
 .login-visual .live-dot{background:#39a45e;box-shadow:0 0 0 5px rgba(57,164,94,.13)}
 .login-visual h2{position:relative;color:#1c452c;font-size:23px;line-height:1.22;margin:14px 0 7px}
 .login-visual .live-subtitle{color:#6e8272;line-height:1.5}
-.public-schedule{position:relative;z-index:1;max-height:285px;padding:2px 4px 2px 0}
+.public-schedule{position:relative;z-index:1;max-height:285px;padding:2px 4px 2px 0}.public-room-group{display:grid;gap:8px;padding-bottom:12px;border-bottom:1px solid #e0ebdf}.public-room-group:last-child{border-bottom:0}.public-room-group .public-room-title{color:#245c38;text-align:left;font-size:16px;padding:0 3px;margin:0}
 .public-schedule-item{border:1px solid #e0ebdf;border-radius:15px;background:rgba(255,255,255,.88);box-shadow:0 5px 15px rgba(35,85,48,.05);padding:14px}
 .public-schedule-item strong{color:#245c38}
 .public-schedule-item .dept{color:#55735d}
