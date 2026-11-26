@@ -73,6 +73,7 @@ public class MainActivity extends Activity {
                 super.onPageFinished(view, url);
                 if (url != null && url.startsWith(APP_URL)) {
                     view.evaluateJavascript(
+                        "(function(){if(window.AndroidNotifications){window.enablePushNotifications=async function(){return 'Notifikasi Android berhasil diaktifkan. Pemberitahuan akan muncul saat aplikasi berjalan.';};window.showReservationNotification=function(title,body){try{window.AndroidNotifications.show(String(title||'Pemberitahuan Reservasi'),String(body||''));return true;}catch(e){return false;}};var b=document.getElementById('enablePush');if(b)b.textContent='🔔 Aktifkan Notifikasi Android';}})();" +
                         "(function(){if(window.__sawahBadgeTimer)return;" +
                         "function check(){fetch('/api/me',{cache:'no-store',credentials:'include'})" +
                         ".then(function(r){if(!r.ok)throw new Error('auth');return r.json();})" +
