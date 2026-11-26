@@ -155,6 +155,8 @@ export default { async fetch(req,env) {
   const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
   const get=t=>parts.find(x=>x.type===t).value;
   const date=get('year')+'-'+get('month')+'-'+get('day'),time=get('hour')+':'+get('minute');
+  const due=await env.DB.prepare("SELECT id,user_id,title,date FROM reservations WHERE status='PENDING' AND date=? AND start_time<=?").bind(date,time).all();
   await env.DB.prepare("UPDATE reservations SET status='APPROVED' WHERE status='PENDING' AND date=? AND start_time<=?").bind(date,time).run();
+  for(const item of due.results)await sendPushToUser(env,item.user_id,{title:"Reservasi Disetujui",body:"Reservasi "+(item.title||"Anda")+" tanggal "+item.date+" otomatis disetujui karena waktu rapat telah dimulai.",url:"/",tag:"auto-approved-"+item.id});
  }
 };
