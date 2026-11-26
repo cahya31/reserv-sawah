@@ -2,6 +2,9 @@ package id.reservasisawah.admin;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -21,7 +24,9 @@ import android.media.AudioManager;
 public class MainActivity extends Activity {
     private static final String APP_URL = "https://reserv-sawah.ayimasnoneng.workers.dev/";
     private static final String CHANNEL_ID = "reservasi_badge";
-    private static final String EVENTS_CHANNEL_ID = "reservasi_events";
+    private static final String EVENTS_CHANNEL_PREFIX = "reservasi_events_";
+    private static final String PREFS_NAME = "reservasi_settings";
+    private static final String PREF_TONE = "notification_tone";
     private static final int BADGE_NOTIFICATION_ID = 731;
     private static final int NOTIFICATION_PERMISSION_REQUEST = 7310;
     private WebView webView;
@@ -38,7 +43,7 @@ public class MainActivity extends Activity {
 
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         createBadgeChannel();
-        createEventsChannel();
+        createEventsChannel(getSelectedTone());
         requestNotificationPermissionIfNeeded();
 
         webView = new WebView(this);
@@ -73,7 +78,7 @@ public class MainActivity extends Activity {
                 super.onPageFinished(view, url);
                 if (url != null && url.startsWith(APP_URL)) {
                     view.evaluateJavascript(
-                        "(function(){if(window.AndroidNotifications){window.enablePushNotifications=async function(){return 'Notifikasi Android berhasil diaktifkan. Pemberitahuan akan muncul saat aplikasi berjalan.';};window.showReservationNotification=function(title,body){try{window.AndroidNotifications.show(String(title||'Pemberitahuan Reservasi'),String(body||''));return true;}catch(e){return false;}};var b=document.getElementById('enablePush');if(b)b.textContent='🔔 Aktifkan Notifikasi Android';}})();" +
+                        "(function(){if(window.AndroidNotifications){window.enablePushNotifications=async function(){return 'Notifikasi Android berhasil diaktifkan. Pemberitahuan akan muncul saat aplikasi berjalan.';};window.showReservationNotification=function(title,body){try{window.AndroidNotifications.show(String(title||'Pemberitahuan Reservasi'),String(body||''));return true;}catch(e){return false;}};var b=document.getElementById('enablePush');if(b)b.textContent='🔔 Aktifkan Notifikasi Android';if(!document.getElementById('androidToneButton')){var t=document.createElement('button');t.id='androidToneButton';t.textContent='🎵 Ganti Nada Notifikasi';t.style.cssText='position:fixed;right:14px;bottom:18px;z-index:2147483647;background:#176b45;color:white;border:0;border-radius:24px;padding:12px 16px;font-weight:700;box-shadow:0 3px 12px #0004';t.onclick=function(){window.AndroidNotifications.showTonePicker();};document.body.appendChild(t);}}})();" +
                         "(function(){if(window.__sawahBadgeTimer)return;" +
                         "function check(){fetch('/api/me',{cache:'no-store',credentials:'include'})" +
                         ".then(function(r){if(!r.ok)throw new Error('auth');return r.json();})" +
@@ -143,7 +148,7 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> {
                 if (notificationManager == null || !canPostNotifications()) return;
                 Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-                    ? new Notification.Builder(MainActivity.this, EVENTS_CHANNEL_ID)
+                    ? new Notification.Builder(MainActivity.this, EVENTS_CHANNEL_PREFIX + getSelectedTone())
                     : new Notification.Builder(MainActivity.this);
                 Notification notification = builder
                     .setSmallIcon(android.R.drawable.ic_dialog_info)
