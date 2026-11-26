@@ -115,16 +115,58 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void createEventsChannel() {
+    private String getSelectedTone() {
+        return getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(PREF_TONE, "default");
+    }
+
+    private void createEventsChannel(String tone) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = EVENTS_CHANNEL_PREFIX + tone;
+            if (notificationManager.getNotificationChannel(channelId) != null) return;
             NotificationChannel channel = new NotificationChannel(
-                EVENTS_CHANNEL_ID, "Pemberitahuan reservasi", NotificationManager.IMPORTANCE_HIGH
+                channelId, "Pemberitahuan reservasi - " + toneLabel(tone), NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Pemberitahuan persetujuan, penolakan, dan perubahan reservasi.");
+            channel.setDescription("Nada notifikasi aplikasi Reservasi Sawah.");
             channel.setShowBadge(true);
             channel.enableVibration(true);
+            if ("silent".equals(tone)) {
+                channel.setSound(null, null);
+            } else {
+                Uri sound = "alarm".equals(tone)
+                    ? android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI
+                    : ("ringtone".equals(tone)
+                        ? android.provider.Settings.System.DEFAULT_RINGTONE_URI
+                        : android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+                channel.setSound(sound, android.media.AudioAttributes.DEFAULT);
+            }
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    private String toneLabel(String tone) {
+        if ("alarm".equals(tone)) return "Alarm";
+        if ("ringtone".equals(tone)) return "Telepon";
+        if ("silent".equals(tone)) return "Tanpa suara";
+        return "Standar";
+    }
+
+    private void chooseTone() {
+        final String[] labels = {"Standar", "Alarm", "Nada telepon", "Tanpa suara"};
+        final String[] values = {"default", "alarm", "ringtone", "silent"};
+        int selected = java.util.Arrays.asList(values).indexOf(getSelectedTone());
+        new AlertDialog.Builder(this)
+            .setTitle("Pilih Nada Notifikasi")
+            .setSingleChoiceItems(labels, Math.max(0, selected), (dialog, which) -> {
+                String tone = values[which];
+                getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putString(PREF_TONE, tone).apply();
+                createEventsChannel(tone);
+                dialog.dismiss();
+                new AlertDialog.Builder(this)
+                    .setMessage("Nada notifikasi diubah menjadi: " + labels[which] + ". Jika nada pernah diubah di setelan Android, periksa setelan kanal notifikasi aplikasi.")
+                    .setPositiveButton("OK", null).show();
+            })
+            .setNegativeButton("Batal", null)
+            .show();
     }
 
     private void requestNotificationPermissionIfNeeded() {
