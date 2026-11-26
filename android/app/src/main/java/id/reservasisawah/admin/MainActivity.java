@@ -71,9 +71,12 @@ public class MainActivity extends Activity {
                 if (url != null && url.startsWith(APP_URL)) {
                     view.evaluateJavascript(
                         "(function(){if(window.__sawahBadgeTimer)return;" +
-                        "function check(){fetch('/api/reservations',{cache:'no-store',credentials:'include'})" +
+                        "function check(){fetch('/api/me',{cache:'no-store',credentials:'include'})" +
                         ".then(function(r){if(!r.ok)throw new Error('auth');return r.json();})" +
-                        ".then(function(d){var rows=d.reservations||[];" +
+                        ".then(function(me){if(!me.user||me.user.role!=='ADMIN'){if(window.AndroidBadge)window.AndroidBadge.setPendingCount(0);return null;}" +
+                        "return fetch('/api/reservations',{cache:'no-store',credentials:'include'});})" +
+                        ".then(function(r){if(!r)return null;if(!r.ok)throw new Error('auth');return r.json();})" +
+                        ".then(function(d){if(!d)return;var rows=d.reservations||[];" +
                         "var pending=rows.filter(function(x){return x.status==='PENDING';}).length;" +
                         "if(window.AndroidBadge)window.AndroidBadge.setPendingCount(pending);})" +
                         ".catch(function(){});}" +
